@@ -3,40 +3,36 @@ package katex
 import (
 	_ "embed"
 	"io"
-	"runtime"
 
-	"github.com/lithdew/quickjs"
+	"github.com/dop251/goja"
 )
 
 //go:embed katex.min.js
-var code string
+var katexjs string
 
 func Render(w io.Writer, src []byte, display bool) error {
-	runtime.LockOSThread()
-	defer runtime.UnlockOSThread()
+	var res goja.Value
+	vm := goja.New()
 
-	runtime := quickjs.NewRuntime()
-	defer runtime.Free()
-
-	context := runtime.NewContext()
-	defer context.Free()
-
-	globals := context.Globals()
-
-	result, err := context.Eval(code)
+	_, err := vm.RunString(katexjs)
 	if err != nil {
 		return err
 	}
-	defer result.Free()
 
-	globals.Set("_EqSrc3120", context.String(string(src)))
-	if display {
-		result, err = context.Eval("katex.renderToString(_EqSrc3120, { displayMode: true })")
-	} else {
-		result, err = context.Eval("katex.renderToString(_EqSrc3120)")
+	err = vm.Set("expression", string(src))
+	if err != nil {
+		return nil
 	}
-	defer result.Free()
 
-	_, err = io.WriteString(w, result.String())
+	if display {
+		res, err = vm.RunString("katex.renderToString(expression, { displayMode: true })")
+	} else {
+		res, err = vm.RunString("katex.renderToString(expression)")
+	}
+	if err != nil {
+		return err
+	}
+
+	_, err = io.WriteString(w, res.Export().(string))
 	return err
 }
