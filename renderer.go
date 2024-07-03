@@ -4,7 +4,6 @@ import (
 	"bytes"
 
 	"github.com/bluele/gcache"
-	"github.com/dop251/goja"
 	"github.com/yuin/goldmark/ast"
 	"github.com/yuin/goldmark/renderer"
 	"github.com/yuin/goldmark/renderer/html"
@@ -16,7 +15,7 @@ type HTMLRenderer struct {
 
 	cacheInline  gcache.Cache
 	cacheDisplay gcache.Cache
-	gojaVM       *goja.Runtime
+	gojaExec     *Exec
 }
 
 func (r *HTMLRenderer) RegisterFuncs(reg renderer.NodeRendererFuncRegisterer) {
@@ -37,7 +36,7 @@ func (r *HTMLRenderer) renderInline(w util.BufWriter, source []byte, n ast.Node,
 
 		if err == gcache.KeyNotFoundError {
 			b := bytes.Buffer{}
-			err = Render(&b, node.Equation, false, r.gojaVM)
+			err = Render(&b, node.Equation, false, r.gojaExec)
 			if err != nil {
 				return ast.WalkStop, err
 			}
@@ -66,7 +65,7 @@ func (r *HTMLRenderer) renderBlock(w util.BufWriter, source []byte, n ast.Node, 
 
 		if err == gcache.KeyNotFoundError {
 			b := bytes.Buffer{}
-			err = Render(&b, node.Equation, true, r.gojaVM)
+			err = Render(&b, node.Equation, true, r.gojaExec)
 			if err != nil {
 				return ast.WalkStop, err
 			}

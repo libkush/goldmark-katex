@@ -6,18 +6,14 @@ import (
 	"github.com/dop251/goja"
 )
 
-func Render(w io.Writer, src []byte, display bool, vm *goja.Runtime) error {
+func Render(w io.Writer, src []byte, display bool, exec *Exec) error {
 	var res goja.Value
-
-	err := vm.Set("expression", string(src))
-	if err != nil {
-		return nil
-	}
+	var err error
 
 	if display {
-		res, err = vm.RunString("katex.renderToString(expression, { displayMode: true })")
+		res, err = exec.RunString("katex.renderToString(expression, { displayMode: true })", Arg{"expression", string(src)})
 	} else {
-		res, err = vm.RunString("katex.renderToString(expression)")
+		res, err = exec.RunString("katex.renderToString(expression)", Arg{"expression", string(src)})
 	}
 	if err != nil {
 		return err
