@@ -1,25 +1,15 @@
 package katex
 
 import (
-	_ "embed"
 	"io"
 
 	"github.com/dop251/goja"
 )
 
-//go:embed katex.min.js
-var katexjs string
-
-func Render(w io.Writer, src []byte, display bool) error {
+func Render(w io.Writer, src []byte, display bool, vm *goja.Runtime) error {
 	var res goja.Value
-	vm := goja.New()
 
-	_, err := vm.RunString(katexjs)
-	if err != nil {
-		return err
-	}
-
-	err = vm.Set("expression", string(src))
+	err := vm.Set("expression", string(src))
 	if err != nil {
 		return nil
 	}
