@@ -48,8 +48,6 @@ func getVm() *goja.Runtime {
 }
 
 func putVm(vm *goja.Runtime) {
-	// adding katex lib beforehand
-	vm.RunString(katexjs)
 	vmPool.Put(vm)
 }
 
