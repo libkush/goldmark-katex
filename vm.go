@@ -34,11 +34,15 @@ import (
 //go:embed katex.min.js
 var katexjs string
 
+//go:embed mhchem.min.js
+var mhchem string
+
 var vmPool = sync.Pool{
 	New: func() interface{} {
 		vm := goja.New()
 		// adding katex lib beforehand
 		vm.RunString(katexjs)
+		vm.RunString(mhchem)
 		return vm
 	},
 }
