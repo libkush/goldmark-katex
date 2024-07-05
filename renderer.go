@@ -70,9 +70,7 @@ func (r *HTMLRenderer) renderBlock(w util.BufWriter, source []byte, n ast.Node, 
 				return ast.WalkStop, err
 			}
 			html := b.Bytes()
-			w.WriteString("<div>")
 			w.Write(html)
-			w.WriteString("</div>")
 			r.cacheDisplay.Set(string(node.Equation), html)
 			return ast.WalkContinue, nil
 		}
